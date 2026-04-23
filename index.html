@@ -188,6 +188,7 @@ body::after {
 .tool-card:nth-child(1) { animation-delay: 1.2s; }
 .tool-card:nth-child(2) { animation-delay: 1.35s; }
 .tool-card:nth-child(3) { animation-delay: 1.5s; }
+.tool-card:nth-child(4) { animation-delay: 1.65s; }
 
 .tool-card::before {
   content: '';
@@ -201,6 +202,7 @@ body::after {
 .tool-card:nth-child(1)::before { background: linear-gradient(90deg, var(--accent), transparent); }
 .tool-card:nth-child(2)::before { background: linear-gradient(90deg, var(--accent2), transparent); }
 .tool-card:nth-child(3)::before { background: linear-gradient(90deg, var(--accent3), transparent); }
+.tool-card:nth-child(4)::before { background: linear-gradient(90deg, var(--accent), transparent); }
 
 .tool-card::after {
   content: '';
@@ -403,6 +405,19 @@ footer a:hover { color: var(--accent); }
         <span class="tag tag-green">MIDI Spec</span>
         <span class="tag tag-grey">Searchable</span>
         <span class="tag tag-grey">Offline</span>
+      </div>
+      <div class="tool-arrow">↗</div>
+    </a>
+
+    <a class="tool-card" href="midimonitor.html">
+      <div class="tool-num">04 — MONITOR</div>
+      <div class="tool-name">MIDI Monitor<br>Generic</div>
+      <div class="tool-desc">A clean real-time MIDI message display for any device. Shows note names, velocity, CC values, Program Changes and raw hex data. No device-specific mapping — works with any MIDI controller.</div>
+      <div class="tool-tags">
+        <span class="tag tag-cyan">Web MIDI</span>
+        <span class="tag tag-grey">Any Device</span>
+        <span class="tag tag-grey">Android Chrome</span>
+        <span class="tag tag-grey">Real-time</span>
       </div>
       <div class="tool-arrow">↗</div>
     </a>
