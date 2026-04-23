@@ -1,0 +1,973 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>RC-600 ASSIGN Planner</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --bg: #07080a;
+  --panel: #0e1117;
+  --panel2: #131820;
+  --border: #1c2a3a;
+  --border2: #243040;
+  --accent: #e8c44a;
+  --accent2: #4ae8c4;
+  --accent3: #e84a6a;
+  --accent4: #4a8ae8;
+  --dim: #1a2535;
+  --text: #d4dde8;
+  --muted: #4a6080;
+  --muted2: #2a3a50;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+/* grid texture */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(232,196,74,0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232,196,74,0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.wrap { position: relative; z-index: 1; max-width: 680px; margin: 0 auto; padding: 0 14px; }
+
+/* HEADER */
+header {
+  padding: 20px 0 16px;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 20px;
+}
+.header-inner { display: flex; align-items: flex-end; justify-content: space-between; }
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 1.2rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-shadow: 0 0 30px rgba(232,196,74,0.4);
+}
+.logo-sub {
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-top: 3px;
+}
+.header-actions { display: flex; gap: 8px; }
+.btn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 6px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  border: 1px solid;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+}
+.btn-primary { background: rgba(232,196,74,0.12); border-color: var(--accent); color: var(--accent); }
+.btn-primary:active { background: rgba(232,196,74,0.25); }
+.btn-ghost { background: none; border-color: var(--border2); color: var(--muted); }
+.btn-ghost:active { color: var(--text); border-color: var(--muted); }
+.btn-danger { background: rgba(232,74,106,0.1); border-color: var(--accent3); color: var(--accent3); }
+
+/* MEMORY TABS */
+.mem-bar {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.mem-label { font-size: 0.55rem; color: var(--muted); letter-spacing: 0.15em; text-transform: uppercase; margin-right: 4px; }
+.mem-tab {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  padding: 5px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border2);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+  -webkit-tap-highlight-color: transparent;
+  position: relative;
+}
+.mem-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(232,196,74,0.08); }
+.mem-tab .mem-dot {
+  width: 5px; height: 5px; border-radius: 50%;
+  background: var(--accent2);
+  position: absolute; top: 3px; right: 3px;
+  display: none;
+}
+.mem-tab.has-data .mem-dot { display: block; }
+.mem-add {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px dashed var(--border2);
+  background: none;
+  color: var(--muted);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.mem-add:active { color: var(--accent); border-color: var(--accent); }
+
+/* MEMORY INFO */
+.mem-info {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 12px 14px;
+  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+}
+.info-field label {
+  display: block;
+  font-size: 0.5rem;
+  letter-spacing: 0.15em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.info-field input, .info-field select {
+  width: 100%;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  padding: 5px 8px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.info-field input:focus, .info-field select:focus { border-color: var(--accent); }
+.info-field select option { background: #111; }
+
+/* FIXED MESSAGES */
+.section-title {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.2em;
+  color: var(--muted);
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.section-title::after { content:''; flex:1; height:1px; background:var(--border); }
+
+.fixed-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 18px;
+}
+.fixed-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 12px;
+  position: relative;
+  overflow: hidden;
+}
+.fixed-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 2px;
+  background: var(--accent2);
+}
+.fixed-card .fc-msg { font-size: 0.6rem; color: var(--accent2); margin-bottom: 3px; }
+.fixed-card .fc-fn { font-size: 0.68rem; color: var(--text); margin-bottom: 3px; }
+.fixed-card .fc-val { font-size: 0.55rem; color: var(--muted); }
+.fixed-card.pc-card { grid-column: span 2; }
+.fixed-card.pc-card::before { background: var(--accent); }
+.fixed-card.pc-card .fc-msg { color: var(--accent); }
+.pc-val-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+.pc-val-row label { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.1em; white-space: nowrap; }
+.pc-val-row input {
+  width: 60px;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--accent);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  padding: 3px 6px;
+  outline: none;
+  text-align: center;
+}
+.pc-val-row input:focus { border-color: var(--accent); }
+
+/* ASSIGN SLOTS */
+.assign-grid { display: flex; flex-direction: column; gap: 8px; margin-bottom: 18px; }
+
+.assign-slot {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  overflow: hidden;
+  transition: border-color 0.15s;
+}
+.assign-slot.filled { border-color: var(--border2); }
+.assign-slot.filled:hover { border-color: rgba(232,196,74,0.3); }
+
+.slot-header {
+  display: grid;
+  grid-template-columns: 36px 70px 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  background: var(--panel2);
+  border-bottom: 1px solid var(--border);
+}
+.slot-num {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  font-weight: 700;
+}
+.slot-num span { color: var(--accent); }
+
+.slot-cc {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.slot-cc-label { font-size: 0.5rem; color: var(--muted); letter-spacing: 0.1em; }
+.slot-cc input {
+  width: 46px;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--accent);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.75rem;
+  padding: 3px 5px;
+  outline: none;
+  text-align: center;
+}
+.slot-cc input:focus { border-color: var(--accent); }
+.cc-invalid { border-color: var(--accent3) !important; color: var(--accent3) !important; }
+
+.slot-target select {
+  width: 100%;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  padding: 4px 6px;
+  outline: none;
+}
+.slot-target select:focus { border-color: var(--accent); }
+.slot-target select option { background: #111; }
+
+.slot-clear {
+  background: none;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  padding: 3px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.slot-clear:active { color: var(--accent3); border-color: var(--accent3); }
+
+.slot-body { padding: 8px 12px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+.slot-field label { display: block; font-size: 0.48rem; letter-spacing: 0.12em; color: var(--muted); text-transform: uppercase; margin-bottom: 3px; }
+.slot-field select, .slot-field input {
+  width: 100%;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.62rem;
+  padding: 4px 6px;
+  outline: none;
+}
+.slot-field select:focus, .slot-field input:focus { border-color: var(--accent); }
+.slot-notes { grid-column: span 3; }
+.slot-notes input { font-size: 0.6rem; }
+.slot-notes input::placeholder { color: var(--muted2); }
+
+/* PHYSICAL BUTTONS */
+.phys-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.phys-card {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 10px 10px;
+  position: relative; overflow: hidden;
+}
+.phys-card::before { content:''; position:absolute; top:0;left:0;bottom:0; width:2px; background: var(--accent4); }
+.phys-card .p-label { font-size: 0.5rem; color: var(--accent4); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:3px; }
+.phys-card select {
+  width: 100%;
+  background: var(--dim);
+  border: 1px solid var(--border2);
+  border-radius: 2px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  padding: 3px 5px;
+  outline: none;
+  margin-top: 2px;
+}
+.phys-card select:focus { border-color: var(--accent4); }
+
+/* NOTES */
+.mem-notes textarea {
+  width: 100%;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.65rem;
+  padding: 10px 12px;
+  outline: none;
+  resize: vertical;
+  min-height: 80px;
+  line-height: 1.6;
+}
+.mem-notes textarea:focus { border-color: var(--accent); }
+.mem-notes textarea::placeholder { color: var(--muted2); }
+
+/* SAVE STATUS */
+#save-status {
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  text-align: right;
+  padding: 6px 0;
+  transition: color 0.3s;
+}
+#save-status.saved { color: var(--accent2); }
+
+/* EXPORT PANEL */
+.export-panel {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  padding: 14px;
+  margin-top: 16px;
+  display: none;
+}
+.export-panel.open { display: block; }
+.export-panel pre {
+  font-size: 0.6rem;
+  color: var(--text);
+  line-height: 1.7;
+  white-space: pre-wrap;
+  word-break: break-word;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+/* CC validity indicator */
+.cc-hint { font-size: 0.5rem; color: var(--muted); margin-top: 2px; }
+.cc-hint.ok { color: var(--accent2); }
+.cc-hint.bad { color: var(--accent3); }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="header-inner">
+    <div>
+      <div class="logo">RC-600</div>
+      <div class="logo-sub">ASSIGN Planner</div>
+    </div>
+    <div class="header-actions">
+      <a href="index.html" class="btn btn-ghost">← Home</a>
+      <button class="btn btn-ghost" id="export-btn">Export</button>
+      <button class="btn btn-primary" id="save-btn">Save All</button>
+    </div>
+  </div>
+  <div id="save-status">No changes</div>
+</header>
+
+<!-- MEMORY TABS -->
+<div class="mem-bar">
+  <span class="mem-label">Memory</span>
+  <div id="mem-tabs"></div>
+  <button class="mem-add" id="add-mem-btn" title="Add memory">+</button>
+</div>
+
+<!-- MEMORY CONTENT -->
+<div id="mem-content"></div>
+
+<!-- EXPORT -->
+<div class="export-panel" id="export-panel">
+  <div class="section-title">Export</div>
+  <pre id="export-text"></pre>
+  <div style="display:flex;gap:8px;margin-top:10px">
+    <button class="btn btn-primary" id="copy-btn">Copy to Clipboard</button>
+    <button class="btn btn-ghost" id="close-export-btn">Close</button>
+  </div>
+</div>
+
+</div><!-- /wrap -->
+
+<script>
+// ─── DATA ───
+const TARGET_OPTIONS = [
+  '— empty —',
+  'TRK1 REC/PLY', 'TRK2 REC/PLY', 'TRK3 REC/PLY',
+  'TRK4 REC/PLY', 'TRK5 REC/PLY', 'TRK6 REC/PLY',
+  'TRK1 STOP', 'TRK2 STOP', 'TRK3 STOP',
+  'TRK4 STOP', 'TRK5 STOP', 'TRK6 STOP',
+  'TRK1 CLEAR', 'TRK2 CLEAR', 'TRK3 CLEAR',
+  'TRK4 CLEAR', 'TRK5 CLEAR', 'TRK6 CLEAR',
+  'TRK1 UNDO/REDO', 'TRK2 UNDO/REDO', 'TRK3 UNDO/REDO',
+  'TRK4 UNDO/REDO', 'TRK5 UNDO/REDO', 'TRK6 UNDO/REDO',
+  'TRK1 PLAY LEVEL', 'TRK2 PLAY LEVEL', 'TRK3 PLAY LEVEL',
+  'TRK4 PLAY LEVEL', 'TRK5 PLAY LEVEL', 'TRK6 PLAY LEVEL',
+  'TRK1 REVERSE', 'TRK2 REVERSE', 'TRK3 REVERSE',
+  'TRK4 REVERSE', 'TRK5 REVERSE', 'TRK6 REVERSE',
+  'ALL ST/STP',
+  'RHYTHM ST/STP', 'RHYTHM VOLUME', 'RHYTHM KIT', 'RHYTHM VARIATION',
+  'INPUT FX A SW', 'INPUT FX B SW', 'INPUT FX C SW', 'INPUT FX D SW',
+  'INPUT FX BANK SW',
+  'TRACK FX A SW', 'TRACK FX B SW', 'TRACK FX C SW', 'TRACK FX D SW',
+  'TRACK FX BANK SW',
+  'MASTER LEVEL', 'TEMPO', 'MEMORY INC', 'MEMORY DEC', 'CURRENT TRACK',
+  'SYNC ST/STP → ALL ST/STP'
+];
+
+const SW_MODES = ['TOGGLE', 'MOMENT'];
+const TRACK_MODES = ['MULTI', 'SINGLE'];
+const PLAY_LEVELS = ['NORMAL (100)', 'LOW (50)', 'HIGH (150)', 'MAX (200)'];
+
+const PHYS_FUNCS = [
+  '— unassigned —',
+  'TRK4 REC/PLY', 'TRK5 REC/PLY', 'TRK6 REC/PLY',
+  'TRK4 STOP', 'TRK5 STOP', 'TRK6 STOP',
+  'ALL ST/STP', 'UNDO/REDO', 'INPUT FX A SW', 'INPUT FX B SW',
+  'TRACK FX A SW', 'TAP TEMPO', 'MEMORY INC', 'MEMORY DEC'
+];
+
+function isValidCC(n) { return (n >= 1 && n <= 31) || (n >= 64 && n <= 95); }
+
+// ─── STATE ───
+let memories = [];
+let currentMem = 0;
+let dirty = false;
+
+function defaultMemory(num) {
+  return {
+    name: `Memory ${String(num).padStart(2,'0')}`,
+    pc: num,
+    tempo: '',
+    timesig: '4/4',
+    assigns: Array.from({length:16}, (_,i) => ({
+      cc: '', target: '— empty —', swMode: 'TOGGLE', min: '0', max: '127', notes: ''
+    })),
+    physButtons: ['TRK4 REC/PLY', 'TRK5 REC/PLY', 'TRK6 REC/PLY'],
+    notes: ''
+  };
+}
+
+// ─── STORAGE ───
+const STORE_KEY = 'rc600_planner_v1';
+
+function save() {
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify(memories));
+    setSaveStatus('Saved ✓', true);
+    dirty = false;
+  } catch(e) { setSaveStatus('Save failed', false); }
+}
+
+function load() {
+  try {
+    const d = localStorage.getItem(STORE_KEY);
+    if (d) { memories = JSON.parse(d); return true; }
+  } catch(e) {}
+  return false;
+}
+
+function setSaveStatus(msg, ok) {
+  const el = document.getElementById('save-status');
+  el.textContent = msg;
+  el.className = ok ? 'saved' : '';
+  if (ok) setTimeout(()=>{ el.textContent='All changes saved'; }, 2000);
+}
+
+function markDirty() {
+  dirty = true;
+  document.getElementById('save-status').textContent = 'Unsaved changes •';
+  document.getElementById('save-status').className = '';
+}
+
+// ─── RENDER ───
+function renderTabs() {
+  const container = document.getElementById('mem-tabs');
+  container.innerHTML = '';
+  memories.forEach((m, i) => {
+    const hasData = m.assigns.some(a => a.target !== '— empty —' && a.target !== '');
+    const btn = document.createElement('button');
+    btn.className = 'mem-tab' + (i===currentMem?' active':'') + (hasData?' has-data':'');
+    btn.innerHTML = `${m.pc ? String(m.pc).padStart(2,'0') : '??'}<div class="mem-dot"></div>`;
+    btn.title = m.name;
+    btn.addEventListener('click', ()=>{ currentMem=i; renderAll(); });
+    container.appendChild(btn);
+  });
+}
+
+function renderMemory() {
+  const m = memories[currentMem];
+  const c = document.getElementById('mem-content');
+  c.innerHTML = '';
+
+  // ── Memory Info ──
+  const info = document.createElement('div');
+  info.className = 'mem-info';
+  info.innerHTML = `
+    <div class="info-field"><label>Memory Name</label>
+      <input type="text" value="${esc(m.name)}" data-field="name" placeholder="e.g. Verse A"></div>
+    <div class="info-field"><label>PC Number (1–99)</label>
+      <input type="number" value="${m.pc||''}" data-field="pc" min="1" max="99" placeholder="1"></div>
+    <div class="info-field"><label>Tempo (BPM)</label>
+      <input type="number" value="${m.tempo||''}" data-field="tempo" min="40" max="250" placeholder="120"></div>
+  `;
+  info.querySelectorAll('input').forEach(inp => {
+    inp.addEventListener('input', ()=>{
+      memories[currentMem][inp.dataset.field] = inp.value;
+      if (inp.dataset.field === 'pc') renderTabs();
+      markDirty();
+    });
+  });
+  c.appendChild(info);
+
+  // ── Fixed Messages ──
+  const fixedTitle = document.createElement('div');
+  fixedTitle.className = 'section-title';
+  fixedTitle.textContent = 'Fixed MIDI Messages';
+  c.appendChild(fixedTitle);
+
+  const fixedGrid = document.createElement('div');
+  fixedGrid.className = 'fixed-grid';
+  fixedGrid.innerHTML = `
+    <div class="fixed-card pc-card">
+      <div class="fc-msg">Program Change</div>
+      <div class="fc-fn">Switch to this Memory</div>
+      <div class="pc-val-row">
+        <label>Send PC#</label>
+        <input type="number" value="${m.pc||''}" min="1" max="99" id="pc-sync" placeholder="1">
+        <span class="fc-val">from your controller to load this memory</span>
+      </div>
+    </div>
+    <div class="fixed-card">
+      <div class="fc-msg">MIDI Start (FA)</div>
+      <div class="fc-fn">All Tracks Play</div>
+      <div class="fc-val">Free — no ASSIGN needed</div>
+    </div>
+    <div class="fixed-card">
+      <div class="fc-msg">MIDI Clock (F8)</div>
+      <div class="fc-fn">Tempo Sync</div>
+      <div class="fc-val">Set SYNC CLOCK → AUTO</div>
+    </div>
+  `;
+  fixedGrid.querySelector('#pc-sync').addEventListener('input', e => {
+    memories[currentMem].pc = e.target.value;
+    renderTabs(); markDirty();
+  });
+  c.appendChild(fixedGrid);
+
+  // ── ASSIGN Slots ──
+  const assignTitle = document.createElement('div');
+  assignTitle.className = 'section-title';
+  assignTitle.textContent = 'ASSIGN Slots (all 16 used)';
+  c.appendChild(assignTitle);
+
+  const assignGrid = document.createElement('div');
+  assignGrid.className = 'assign-grid';
+
+  m.assigns.forEach((a, i) => {
+    const slot = document.createElement('div');
+    const filled = a.target && a.target !== '— empty —';
+    slot.className = 'assign-slot' + (filled?' filled':'');
+
+    const ccNum = parseInt(a.cc);
+    const ccValid = a.cc==='' || isValidCC(ccNum);
+    const ccHintText = a.cc==='' ? 'CC#1–31 or CC#64–95' : (ccValid ? '✓ Valid CC#' : '✗ Not usable on RC-600');
+    const ccHintClass = a.cc==='' ? '' : (ccValid ? 'ok' : 'bad');
+
+    // build target options
+    const targetOpts = TARGET_OPTIONS.map(t =>
+      `<option value="${t}" ${t===a.target?'selected':''}>${t}</option>`
+    ).join('');
+    const swOpts = SW_MODES.map(s=>`<option ${s===a.swMode?'selected':''}>${s}</option>`).join('');
+
+    slot.innerHTML = `
+      <div class="slot-header">
+        <div class="slot-num">A<span>${i+1}</span></div>
+        <div class="slot-cc">
+          <span class="slot-cc-label">CC#</span>
+          <input type="number" value="${esc(a.cc)}" placeholder="—" min="1" max="95" class="cc-input">
+        </div>
+        <div class="slot-target">
+          <select class="target-select">${targetOpts}</select>
+        </div>
+        <button class="slot-clear">✕</button>
+      </div>
+      <div class="slot-body">
+        <div class="slot-field">
+          <label>SW Mode</label>
+          <select class="sw-select">${swOpts}</select>
+        </div>
+        <div class="slot-field">
+          <label>Min Value</label>
+          <input type="text" value="${esc(a.min)}" placeholder="0" class="min-input">
+        </div>
+        <div class="slot-field">
+          <label>Max Value</label>
+          <input type="text" value="${esc(a.max)}" placeholder="127" class="max-input">
+        </div>
+        <div class="slot-field slot-notes">
+          <label>Notes</label>
+          <input type="text" value="${esc(a.notes)}" placeholder="e.g. left foot, guitar loop..." class="notes-input">
+        </div>
+      </div>
+      <div style="padding:0 12px 8px;"><div class="cc-hint ${ccHintClass}">${ccHintText}</div></div>
+    `;
+
+    // events
+    const ccInp = slot.querySelector('.cc-input');
+    ccInp.addEventListener('input', ()=>{
+      const v = ccInp.value;
+      const n = parseInt(v);
+      const valid = v==='' || isValidCC(n);
+      ccInp.className = 'cc-input' + (valid?'':' cc-invalid');
+      const hint = slot.querySelector('.cc-hint');
+      hint.textContent = v==='' ? 'CC#1–31 or CC#64–95' : (valid?'✓ Valid CC#':'✗ Not usable on RC-600');
+      hint.className = 'cc-hint' + (v===''?'':(valid?' ok':' bad'));
+      memories[currentMem].assigns[i].cc = v;
+      markDirty();
+    });
+
+    slot.querySelector('.target-select').addEventListener('change', e=>{
+      memories[currentMem].assigns[i].target = e.target.value;
+      slot.className = 'assign-slot' + (e.target.value!=='— empty —'?' filled':'');
+      markDirty();
+    });
+    slot.querySelector('.sw-select').addEventListener('change', e=>{
+      memories[currentMem].assigns[i].swMode = e.target.value; markDirty();
+    });
+    slot.querySelector('.min-input').addEventListener('input', e=>{
+      memories[currentMem].assigns[i].min = e.target.value; markDirty();
+    });
+    slot.querySelector('.max-input').addEventListener('input', e=>{
+      memories[currentMem].assigns[i].max = e.target.value; markDirty();
+    });
+    slot.querySelector('.notes-input').addEventListener('input', e=>{
+      memories[currentMem].assigns[i].notes = e.target.value; markDirty();
+    });
+    slot.querySelector('.slot-clear').addEventListener('click', ()=>{
+      memories[currentMem].assigns[i] = {cc:'',target:'— empty —',swMode:'TOGGLE',min:'0',max:'127',notes:''};
+      renderMemory(); markDirty();
+    });
+
+    assignGrid.appendChild(slot);
+  });
+  c.appendChild(assignGrid);
+
+  // ── Physical Buttons ──
+  const physTitle = document.createElement('div');
+  physTitle.className = 'section-title';
+  physTitle.textContent = 'Physical Buttons (Rear CTL 1–3)';
+  c.appendChild(physTitle);
+
+  const physGrid = document.createElement('div');
+  physGrid.className = 'phys-grid';
+  ['CTL 1', 'CTL 2', 'CTL 3'].forEach((label, i) => {
+    const opts = PHYS_FUNCS.map(f=>`<option ${f===m.physButtons[i]?'selected':''}>${f}</option>`).join('');
+    const card = document.createElement('div');
+    card.className = 'phys-card';
+    card.innerHTML = `<div class="p-label">${label}</div><select>${opts}</select>`;
+    card.querySelector('select').addEventListener('change', e=>{
+      memories[currentMem].physButtons[i] = e.target.value; markDirty();
+    });
+    physGrid.appendChild(card);
+  });
+  c.appendChild(physGrid);
+
+  // ── Memory Notes ──
+  const notesTitle = document.createElement('div');
+  notesTitle.className = 'section-title';
+  notesTitle.textContent = 'Memory Notes';
+  c.appendChild(notesTitle);
+
+  const notesDiv = document.createElement('div');
+  notesDiv.className = 'mem-notes';
+  notesDiv.innerHTML = `<textarea placeholder="e.g. Verse A — 8 bars at 95bpm, track 1 is kick loop, switch to Memory 02 for chorus...">${esc(m.notes)}</textarea>`;
+  notesDiv.querySelector('textarea').addEventListener('input', e=>{
+    memories[currentMem].notes = e.target.value; markDirty();
+  });
+  c.appendChild(notesDiv);
+
+  // delete mem button (only if >1)
+  if (memories.length > 1) {
+    const delWrap = document.createElement('div');
+    delWrap.style.cssText = 'margin-top:16px;display:flex;justify-content:flex-end';
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn btn-danger';
+    delBtn.textContent = 'Delete This Memory';
+    delBtn.addEventListener('click', ()=>{
+      if (confirm(`Delete ${memories[currentMem].name}?`)) {
+        memories.splice(currentMem, 1);
+        currentMem = Math.max(0, currentMem-1);
+        renderAll(); markDirty();
+      }
+    });
+    delWrap.appendChild(delBtn);
+    c.appendChild(delWrap);
+  }
+}
+
+function renderAll() {
+  renderTabs();
+  renderMemory();
+}
+
+function esc(s) {
+  if (s === undefined || s === null) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ─── EXPORT ───
+function buildExport() {
+  let out = '═══════════════════════════════════\n';
+  out += '  RC-600 ASSIGN PLANNER — EXPORT\n';
+  out += `  Generated: ${new Date().toLocaleDateString('en-GB')}\n`;
+  out += '═══════════════════════════════════\n\n';
+
+  memories.forEach(m => {
+    out += `┌─ ${m.name} (PC#${m.pc||'?'}) ${m.tempo?'@ '+m.tempo+' BPM':''}\n`;
+    out += `│\n`;
+    out += `│  FIXED MESSAGES\n`;
+    out += `│  PC#${m.pc||'?'} → Load this memory\n`;
+    out += `│  FA (MIDI Start) → All tracks play\n`;
+    out += `│  F8 (MIDI Clock) → Tempo sync\n`;
+    out += `│\n`;
+    out += `│  ASSIGNS\n`;
+    m.assigns.forEach((a,i) => {
+      if (a.target && a.target !== '— empty —') {
+        out += `│  A${i+1}  CC#${a.cc||'?'}  →  ${a.target}  [${a.swMode}] min:${a.min} max:${a.max}`;
+        if (a.notes) out += `  // ${a.notes}`;
+        out += '\n';
+      }
+    });
+    const empty = m.assigns.filter(a=>!a.target||a.target==='— empty —').length;
+    if (empty) out += `│  (${empty} slot${empty>1?'s':''} unused)\n`;
+    out += `│\n`;
+    out += `│  PHYSICAL BUTTONS\n`;
+    ['CTL 1','CTL 2','CTL 3'].forEach((l,i)=>{ out+=`│  ${l}: ${m.physButtons[i]||'—'}\n`; });
+    if (m.notes) { out += `│\n│  NOTES: ${m.notes}\n`; }
+    out += `└${'─'.repeat(40)}\n\n`;
+  });
+  return out;
+}
+
+// ─── INIT ───
+if (!load()) {
+  memories = [defaultMemory(1)];
+  memories[0].name = 'Memory 01';
+  memories[0].tempo = '120';
+
+  // Full 16-slot assign map — finalised
+  memories[0].assigns = [
+    {cc:'EXP', target:'TRK1 PLAY LEVEL', swMode:'TOGGLE', min:'0', max:'200', notes:'Roland EV5 — INST 1 input volume'},
+    {cc:'75',  target:'MASTER LEVEL',    swMode:'TOGGLE', min:'0', max:'200', notes:'Tempopad Knob 3 — Master volume'},
+    {cc:'76',  target:'TRK1 PLAY LEVEL', swMode:'TOGGLE', min:'0', max:'200', notes:'Tempopad Knob 4 — Loop playback level'},
+    {cc:'77',  target:'MASTER LEVEL',    swMode:'TOGGLE', min:'0', max:'200', notes:'Tempopad Knob 1 — Mic 1 input level'},
+    {cc:'78',  target:'RHYTHM VOLUME',   swMode:'TOGGLE', min:'0', max:'200', notes:'Tempopad Knob 2 — Rhythm volume'},
+    {cc:'1',   target:'RHYTHM ST/STP',   swMode:'TOGGLE', min:'0', max:'127', notes:'MFC10 Pedal 1 — Rhythm ON/OFF'},
+    {cc:'2',   target:'RHYTHM VARIATION',swMode:'TOGGLE', min:'0', max:'127', notes:'MFC10 Pedal 2 — Variation A (normal pattern)'},
+    {cc:'3',   target:'RHYTHM VARIATION',swMode:'TOGGLE', min:'0', max:'127', notes:'MFC10 Pedal 3 — Variation D (drum break/fill)'},
+    {cc:'4',   target:'INPUT FX A SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 4 + Tempopad pad — FX A-A Chorus'},
+    {cc:'5',   target:'INPUT FX B SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 5 + Tempopad pad — FX A-B Flanger'},
+    {cc:'6',   target:'INPUT FX C SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 6 + Tempopad pad — FX A-C Sustainer'},
+    {cc:'7',   target:'INPUT FX D SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 7 + Tempopad pad — FX A-D Octave'},
+    {cc:'8',   target:'INPUT FX A SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 8 — FX B-A Auto Riff'},
+    {cc:'9',   target:'INPUT FX B SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'MFC10 Pedal 9 — FX B-B Guitar to Bass'},
+    {cc:'10',  target:'INPUT FX C SW',   swMode:'TOGGLE', min:'0', max:'1',   notes:'FX B-C Tremolo (may replace with physical pedal)'},
+    {cc:'64',  target:'INPUT FX A SW',   swMode:'MOMENT', min:'0', max:'127', notes:'MFC10 Expression — FX A-A Chorus intensity (may move to Flanger B)'},
+  ];
+
+  memories[0].physButtons = ['UNDO/REDO', 'INPUT FX A SW', 'ALL ST/STP'];
+  memories[0].notes = `╔══════════════════════════════════════════╗
+  RC-600 COMPLETE SYSTEM REFERENCE
+╚══════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+SIGNAL CHAIN
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Tempopad → MFC10 → RC-600 → Amp (MAIN L)
+RC-600 USB → Cubase (6 mono channels)
+All MIDI control on Channel 16
+Drum pads on Channel 10 (RX RHYTHM VOICE CH)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RC-600 SYSTEM SETTINGS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+USB Mode:         VENDOR (MENU > STORAGE > USB MODE)
+Output Preference: SYSTEM (MENU > OUTPUT > PREFERENCE)
+  Routing, Sub Mix, Pan all set to SYSTEM
+  (ensures routing persists across memory changes)
+RX CTL CH:        16
+RX RHYTHM VOICE:  10
+TX CH:            default
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+PHYSICAL PORTS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CTL1,2/EXP1 → Roland EV5     → INST 1 input volume (ASSIGN 1)
+CTL3,4/EXP2 → Boss FS-7      → Memory INC/DEC
+MFC10 EXP   → FX intensity   → ASSIGN 16
+MAIN L      → Amp            → Live monitor mix
+USB         → Laptop/Cubase  → 6 channel multitrack recording
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MEMORY SWITCHING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Boss FS-7:    Scroll INC/DEC through all 100 memories
+MFC10 PC mode: Direct access (not normally used)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TRACK SETUP
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Tracks 1-3: Pre-programmed beat loops from Cubase (SINGLE mode)
+Tracks 4-6: Live instrument recording and overdub (MULTI mode)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+RC-600 OUTPUT ROUTING
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Source          Output    Pan         USB Channel    Cubase Track
+Monitor mix     MAIN      Centre/L    USB 1 (Main L) Amp monitor
+Tracks 1,2,3    MAIN      Hard Right  USB 2 (Main R) Beats 1-3
+Tracks 4,5,6    SUB 1     Hard Left   USB 3 (Sub1 L) Loops 4-6
+Mic 1           SUB 1     Hard Right  USB 4 (Sub1 R) Vocal
+Inst 1          SUB 2     Hard Left   USB 5 (Sub2 L) Guitar
+Inst 2          SUB 2     Hard Right  USB 6 (Sub2 R) Instrument 2
+
+NOTE: Panning used to isolate signals onto separate sides of each
+stereo USB pair, giving 6 discrete mono channels over one USB cable.
+Adjust levels via USB OUT LEVEL in RC-600 OUTPUT menu (not gain knobs)
+to avoid affecting amp volume.
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+CUBASE AUDIO CONNECTIONS (Inputs)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+6 x Mono Input Buses (delete default stereo bus first):
+  Mono 1 (Amp Mon):   RC-600 Main L
+  Mono 2 (Loops 1-3): RC-600 Main R
+  Mono 3 (Loops 4-6): RC-600 Sub 1 L
+  Mono 4 (Vocal):     RC-600 Sub 1 R
+  Mono 5 (Guitar):    RC-600 Sub 2 L
+  Mono 6 (Inst 2):    RC-600 Sub 2 R
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+MFC10 PEDALS (Function mode, CH16)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+1=Rhythm ON/OFF      CC#1
+2=Pattern A (normal) CC#2
+3=Pattern D (fill)   CC#3
+4=Chorus ON/OFF      CC#4
+5=Flanger ON/OFF     CC#5
+6=Sustainer ON/OFF   CC#6
+7=Octave ON/OFF      CC#7
+8=Auto Riff ON/OFF   CC#8
+9=Guitar to Bass     CC#9
+EXP=FX intensity     CC#64
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+TEMPOPAD KNOBS (CH16)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Knob 1 = CC#77 → Mic 1 level
+Knob 2 = CC#78 → Rhythm volume
+Knob 3 = CC#75 → Master volume
+Knob 4 = CC#76 → Loop playback level
+
+TEMPOPAD TRANSPORT BUTTONS (CH16)
+Rewind       = CC#82
+Stop         = CC#83
+Fast Forward = CC#84
+Record       = CC#79
+Play         = CC#80
+Loop         = CC#81
+
+TEMPOPAD PADS
+CH16: FX pads duplicate MFC10 pedals 4-7
+      (Chorus / Flanger / Sustainer / Octave)
+CH10: Drum pads trigger RC-600 rhythm voice`;
+}
+
+document.getElementById('save-btn').addEventListener('click', save);
+
+document.getElementById('add-mem-btn').addEventListener('click', ()=>{
+  const nextPc = memories.length + 1;
+  memories.push(defaultMemory(nextPc));
+  currentMem = memories.length - 1;
+  renderAll(); markDirty();
+});
+
+document.getElementById('export-btn').addEventListener('click', ()=>{
+  const panel = document.getElementById('export-panel');
+  panel.classList.toggle('open');
+  if (panel.classList.contains('open')) {
+    document.getElementById('export-text').textContent = buildExport();
+  }
+});
+
+document.getElementById('close-export-btn').addEventListener('click', ()=>{
+  document.getElementById('export-panel').classList.remove('open');
+});
+
+document.getElementById('copy-btn').addEventListener('click', ()=>{
+  const text = document.getElementById('export-text').textContent;
+  navigator.clipboard.writeText(text).then(()=>{
+    document.getElementById('copy-btn').textContent = 'Copied ✓';
+    setTimeout(()=>{ document.getElementById('copy-btn').textContent = 'Copy to Clipboard'; }, 2000);
+  });
+});
+
+// auto-save every 30s
+setInterval(()=>{ if(dirty) save(); }, 30000);
+
+renderAll();
+setSaveStatus('Loaded ✓', true);
+</script>
+</body>
+</html>

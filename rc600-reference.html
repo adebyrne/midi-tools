@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>RC-600 MIDI Reference — MIDI Tools</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Orbitron:wght@400;700;900&display=swap');
+
+:root {
+  --bg: #050a0e;
+  --panel: #0a1520;
+  --border: #0d2535;
+  --border2: #1a3550;
+  --accent: #39ff14;
+  --accent2: #f5a623;
+  --accent3: #ff4d6d;
+  --accent4: #a78bfa;
+  --dim: #1a3a50;
+  --text: #c8e6f5;
+  --muted: #3a6080;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  min-height: 100vh;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(57,255,20,0.012) 2px, rgba(57,255,20,0.012) 4px);
+  pointer-events: none;
+  z-index: 1000;
+}
+
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border);
+  background: linear-gradient(180deg, #081420 0%, var(--bg) 100%);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.logo {
+  font-family: 'Orbitron', monospace;
+  font-weight: 900;
+  font-size: 0.9rem;
+  letter-spacing: 0.15em;
+  color: var(--accent);
+  text-shadow: 0 0 20px rgba(57,255,20,0.4);
+}
+.logo span { color: var(--accent2); font-size: 0.6rem; margin-left: 8px; letter-spacing: 0.1em; }
+
+.back-btn {
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.6rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  background: none;
+  border: 1px solid var(--border2);
+  padding: 5px 12px;
+  border-radius: 2px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.back-btn:hover { color: var(--accent); border-color: var(--accent); }
+
+.main { padding: 14px; display: flex; flex-direction: column; gap: 12px; max-width: 800px; margin: 0 auto; }
+
+.ref-intro {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 14px 16px;
+  font-size: 0.65rem;
+  line-height: 1.7;
+  color: var(--text);
+}
+.ref-intro h3 {
+  font-family: 'Orbitron', monospace;
+  font-size: 0.7rem;
+  color: var(--accent);
+  margin-bottom: 8px;
+  letter-spacing: 0.1em;
+}
+
+.ref-search {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ref-search input {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.7rem;
+  flex: 1;
+  outline: none;
+}
+.ref-search input::placeholder { color: var(--muted); }
+
+.ref-section {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.ref-section-title {
+  padding: 8px 14px;
+  background: rgba(57,255,20,0.05);
+  border-bottom: 1px solid var(--border);
+  font-family: 'Orbitron', monospace;
+  font-size: 0.6rem;
+  color: var(--accent);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 0.65rem; }
+th {
+  padding: 6px 10px;
+  text-align: left;
+  font-size: 0.55rem;
+  letter-spacing: 0.12em;
+  color: var(--muted);
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+  background: rgba(0,0,0,0.2);
+  font-weight: normal;
+}
+td {
+  padding: 7px 10px;
+  border-bottom: 1px solid rgba(13,37,53,0.5);
+  vertical-align: top;
+  line-height: 1.5;
+}
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: rgba(57,255,20,0.02); }
+
+.td-msg { color: var(--accent4); font-size: 0.6rem; white-space: nowrap; }
+.td-val { color: var(--accent2); font-size: 0.6rem; }
+.td-fn { color: var(--accent); }
+.td-note { color: var(--muted); font-size: 0.58rem; line-height: 1.4; }
+
+.badge { display: inline-block; font-size: 0.5rem; letter-spacing: 0.08em; padding: 1px 5px; border-radius: 2px; text-transform: uppercase; }
+.badge-assign { background: rgba(167,139,250,0.15); color: var(--accent4); border: 1px solid rgba(167,139,250,0.3); }
+.badge-fixed { background: rgba(57,255,20,0.1); color: var(--accent); border: 1px solid rgba(57,255,20,0.3); }
+.badge-ignored { background: rgba(255,77,109,0.1); color: var(--accent3); border: 1px solid rgba(255,77,109,0.3); }
+
+footer {
+  text-align: center;
+  padding: 20px;
+  font-size: 0.55rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+}
+footer a { color: var(--muted); text-decoration: none; }
+footer a:hover { color: var(--accent); }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">RC-600 MIDI REF<span>MIDI TOOLS</span></div>
+  <a class="back-btn" href="index.html">← Back</a>
+</header>
+
+<div class="main">
+
+  <div class="ref-intro">
+    <h3>Boss RC-600 MIDI Implementation</h3>
+    The RC-600 does <strong style="color:var(--accent)">not</strong> have fixed CC→function mappings. It uses a flexible <strong>ASSIGN</strong> system — you pick any valid CC# and map it to any target function. Fixed messages (Program Change, Clock, Start/Stop) always work with no setup. Valid CC numbers for ASSIGN are <strong style="color:var(--accent2)">CC#1–31</strong> and <strong style="color:var(--accent2)">CC#64–95</strong>.
+  </div>
+
+  <div class="ref-search">
+    <span style="color:var(--muted)">⌕</span>
+    <input type="text" id="search-input" placeholder="Search functions, CC numbers, targets..." autocomplete="off" spellcheck="false">
+  </div>
+
+  <div class="ref-section" data-group="fixed">
+    <div class="ref-section-title">Fixed Messages — Always Active</div>
+    <table>
+      <thead><tr><th>MIDI Msg</th><th>Value</th><th>RC-600 Function</th><th>Notes</th></tr></thead>
+      <tbody>
+        <tr><td class="td-msg">Program Change</td><td class="td-val">1–99</td><td class="td-fn">Switch Memory 01–99 <span class="badge badge-fixed">FIXED</span></td><td class="td-note">PC 1 → Memory 01. Messages 100–128 ignored.</td></tr>
+        <tr><td class="td-msg">MIDI Start (FA)</td><td class="td-val">—</td><td class="td-fn">All Tracks Start <span class="badge badge-fixed">FIXED</span></td><td class="td-note">All tracks begin playback simultaneously. Set SYNC CLOCK to AUTO.</td></tr>
+        <tr><td class="td-msg">MIDI Stop (FC)</td><td class="td-val">—</td><td class="td-fn">All Tracks Stop <span class="badge badge-fixed">FIXED</span></td><td class="td-note">Requires ASSIGN with SOURCE=SYNC ST/STP and TARGET=ALL ST/STP.</td></tr>
+        <tr><td class="td-msg">MIDI Clock (F8)</td><td class="td-val">—</td><td class="td-fn">Tempo Sync <span class="badge badge-fixed">FIXED</span></td><td class="td-note">RC-600 syncs BPM to incoming clock. Set SYNC CLOCK → AUTO.</td></tr>
+        <tr><td class="td-msg">Bank Select CC#0/32</td><td class="td-val">any</td><td class="td-fn">Ignored <span class="badge badge-ignored">IGNORED</span></td><td class="td-note">Bank Select messages are discarded by the RC-600.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-section" data-group="assign">
+    <div class="ref-section-title">Assignable CC Targets (MENU → ASSIGN)</div>
+    <table>
+      <thead><tr><th>ASSIGN Target</th><th>CC# Range</th><th>Value</th><th>What it Does</th></tr></thead>
+      <tbody>
+        <tr><td class="td-fn">TRK1–6 REC/PLY <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Triggers Record → Play → Overdub cycle for that track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 STOP <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Stops playback/recording on the specified track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 CLEAR <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Clears (erases) the loop on the specified track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 UNDO/REDO <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Undoes or redoes the last overdub on that track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 PLAY LEVEL <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–200</td><td class="td-note">Controls the playback volume of that track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 REVERSE <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Toggles reverse playback on/off for the track.</td></tr>
+        <tr><td class="td-fn">TRK1–6 1SHOT <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Toggles one-shot (play once and stop) mode.</td></tr>
+        <tr><td class="td-fn">ALL ST/STP <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Starts or stops all tracks simultaneously.</td></tr>
+        <tr><td class="td-fn">RHYTHM ST/STP <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Starts or stops the onboard rhythm/drum pattern.</td></tr>
+        <tr><td class="td-fn">RHYTHM VOLUME <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–200</td><td class="td-note">Controls the rhythm output volume.</td></tr>
+        <tr><td class="td-fn">RHYTHM KIT <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">STUDIO→808+909</td><td class="td-note">Switches between 16 drum kits.</td></tr>
+        <tr><td class="td-fn">RHYTHM VARIATION <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">A–D</td><td class="td-note">Switches between the 4 variations (A/B/C/D) of the current pattern.</td></tr>
+        <tr><td class="td-fn">INPUT FX A–D SW <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Turns Input FX A, B, C, or D on or off.</td></tr>
+        <tr><td class="td-fn">TRACK FX A–D SW <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Turns Track FX A, B, C, or D on or off.</td></tr>
+        <tr><td class="td-fn">INPUT FX BANK SW <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Turns the entire Input FX bank on or off.</td></tr>
+        <tr><td class="td-fn">TRACK FX BANK SW <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">OFF/ON</td><td class="td-note">Turns the entire Track FX bank on or off.</td></tr>
+        <tr><td class="td-fn">MASTER LEVEL <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–200</td><td class="td-note">Controls the overall master output level.</td></tr>
+        <tr><td class="td-fn">TEMPO <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">40–250 BPM</td><td class="td-note">Sets the loop/rhythm tempo.</td></tr>
+        <tr><td class="td-fn">MEMORY INC/DEC <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">0–127</td><td class="td-note">Steps through memories up or down by one.</td></tr>
+        <tr><td class="td-fn">CURRENT TRACK <span class="badge badge-assign">ASSIGN</span></td><td class="td-val">CC#1–31, 64–95</td><td class="td-val">TRK1–6</td><td class="td-note">Sets which track is the active edit target.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-section" data-group="setup">
+    <div class="ref-section-title">How to Set Up an Assignment on RC-600</div>
+    <table>
+      <thead><tr><th>Step</th><th>Action</th></tr></thead>
+      <tbody>
+        <tr><td class="td-val">1</td><td class="td-note">Press <strong style="color:var(--text)">MENU</strong> on the RC-600</td></tr>
+        <tr><td class="td-val">2</td><td class="td-note">Navigate to <strong style="color:var(--text)">ASSIGN</strong></td></tr>
+        <tr><td class="td-val">3</td><td class="td-note">Select any of the 16 available ASSIGN slots (1–16)</td></tr>
+        <tr><td class="td-val">4</td><td class="td-note">Set <strong style="color:var(--accent)">SOURCE</strong> to <strong style="color:var(--text)">MIDI CC#</strong> and choose your CC number</td></tr>
+        <tr><td class="td-val">5</td><td class="td-note">Set <strong style="color:var(--accent)">TARGET</strong> to the function you want (e.g. TRK4 REC/PLY)</td></tr>
+        <tr><td class="td-val">6</td><td class="td-note">Set <strong style="color:var(--accent)">SW MODE</strong> to TOGGLE (latching) or MOMENT (held)</td></tr>
+        <tr><td class="td-val">7</td><td class="td-note">Press <strong style="color:var(--text)">EXIT + ENTER</strong> simultaneously to <strong style="color:var(--accent2)">WRITE/SAVE</strong> to memory</td></tr>
+        <tr><td class="td-val" style="color:var(--accent3)">⚠</td><td class="td-note" style="color:var(--accent3)">Assigns are per-memory, not global. Save to every memory that needs them.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="ref-section" data-group="ccnums">
+    <div class="ref-section-title">Valid CC Numbers for RC-600 ASSIGN</div>
+    <table>
+      <thead><tr><th>Range</th><th>CC Numbers</th></tr></thead>
+      <tbody>
+        <tr><td class="td-fn">Lower Range</td><td class="td-note"><span style="color:var(--accent)">CC#1 – CC#31</span> (31 numbers)</td></tr>
+        <tr><td class="td-fn">Upper Range</td><td class="td-note"><span style="color:var(--accent)">CC#64 – CC#95</span> (32 numbers)</td></tr>
+        <tr><td class="td-fn">Not Supported</td><td class="td-note" style="color:var(--muted)">CC#0 (Bank Select), CC#32–63, CC#96–127 cannot be used as ASSIGN sources</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<footer>
+  <a href="index.html">← MIDI Tools</a> · RC-600 MIDI Reference · Free to use · Not affiliated with Boss or Roland
+</footer>
+
+<script>
+document.getElementById('search-input').addEventListener('input', function() {
+  const q = this.value.toLowerCase();
+  document.querySelectorAll('.ref-section tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(q) ? '' : 'none';
+  });
+  document.querySelectorAll('.ref-section').forEach(sec => {
+    const visible = [...sec.querySelectorAll('tbody tr')].some(r => r.style.display !== 'none');
+    sec.style.display = visible ? '' : (q ? 'none' : '');
+  });
+});
+</script>
+</body>
+</html>
